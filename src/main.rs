@@ -1,5 +1,5 @@
-mod a212;
+mod a934;
 fn main() {
-    let test="test";
-    println!("{}",test);
+    let test = "test";
+    println!("{}", test);
 }
