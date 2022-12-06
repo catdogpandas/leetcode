@@ -5,29 +5,14 @@
  */
 
 // @lc code=start
-use std::{cell::RefCell, collections::HashMap, ptr::NonNull, rc::Rc};
-struct Node {
-    key: i32,
-    val: i32,
-    prev: Option<Rc<RefCell<Node>>>,
-    next: Option<Rc<RefCell<Node>>>,
-}
-impl Node {
-    fn new(key: i32, val: i32) -> Self {
-        Self {
-            key,
-            val,
-            prev: None,
-            next: None,
-        }
-    }
-}
-
+use std::{
+    collections::{HashMap, VecDeque},
+    hash::Hash,
+};
 struct LRUCache {
-    capacity: i32,
-    size: i32,
-    head: Option<Rc<RefCell<Node>>>,
-    map: HashMap<i32, NonNull<Node>>,
+    capacity: usize,
+    cache: HashMap<i32, i32>,
+    history: VecDeque<i32>,
 }
 
 /**
@@ -37,21 +22,36 @@ struct LRUCache {
 impl LRUCache {
     fn new(capacity: i32) -> Self {
         Self {
-            capacity,
-            size: 0,
-            head: None,
-            map: HashMap::new(),
+            capacity: capacity as usize,
+            cache: HashMap::new(),
+            history: VecDeque::new(),
         }
     }
 
-    fn get(&self, key: i32) -> i32 {
-        if let Some(node) = self.map.get(&key) {
-            
+    fn get(&mut self, key: i32) -> i32 {
+        if self.history.contains(&key) {
+            self.history.retain(|&x| x != key);
         }
-        -1
+        if self.cache.contains_key(&key) {
+            self.history.push_back(key);
+        }
+        *self.cache.get(&key).unwrap_or(&-1)
     }
 
-    fn put(&self, key: i32, value: i32) {}
+    fn put(&mut self, key: i32, value: i32) {
+        if self.cache.len() >= self.capacity && !self.cache.contains_key(&key) {
+            self.cache.remove(&self.history[0]);
+            let item = self.history[0];
+            self.history.retain(|&x| x != item);
+        }
+        if self.history.contains(&key) {
+            self.history.retain(|&x| x != key);
+        }
+        if !self.history.contains(&key) {
+            self.history.push_back(key);
+        }
+        *self.cache.entry(key).or_insert(value) = value;
+    }
 }
 
 // @lc code=end
