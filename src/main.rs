@@ -1,5 +1,4 @@
-mod of10_2;
+pub mod of63;
 fn main() {
-    let test = "test";
-    println!("{}", test);
+    println!("Hello, world!");
 }

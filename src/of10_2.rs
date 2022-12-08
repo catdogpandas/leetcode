@@ -8,12 +8,12 @@ struct Solution;
 // @lc code=start
 impl Solution {
     pub fn num_ways(n: i32) -> i32 {
-
+        (0..n)
+            .fold((0, 1), |res, x| (res.1, (res.0 + res.1) % 1000000007))
+            .1
     }
 }
 // @lc code=end
-
-
 
 /*
 // @lcpr case=start
@@ -29,5 +29,3 @@ impl Solution {
 // @lcpr case=end
 
  */
-
-
