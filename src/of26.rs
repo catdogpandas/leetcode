@@ -32,34 +32,54 @@ impl Solution {
         a: Option<Rc<RefCell<TreeNode>>>,
         b: Option<Rc<RefCell<TreeNode>>>,
     ) -> bool {
-        match (a, b) {
-            (None, None) => return false,
-            (None, Some(_)) => return false,
-            (Some(_), None) => return false,
-            (Some(a), Some(b)) => {
-                if a.borrow().val == b.borrow().val {
-                    if (b.borrow().left.is_some()
-                        && Self::is_sub_structure(a.borrow().left.clone(), b.borrow().left.clone())
-                        || b.borrow().left.is_none())
-                        && (b.borrow().right.is_some()
-                            && Self::is_sub_structure(
-                                a.borrow().right.clone(),
-                                b.borrow().right.clone(),
-                            )
-                            || b.borrow().right.is_none())
-                    {
-                        return true;
-                    }
-                }
-                if Self::is_sub_structure(a.borrow().left.clone(), Some(b.clone())) {
-                    return true;
-                }
-                if Self::is_sub_structure(a.borrow().right.clone(), Some(b)) {
-                    return true;
-                }
+        if b.clone() == None {
+            return false;
+        }
+        sub_structure(a.clone(), b.clone())
+    }
+}
 
+pub fn sub_structure(a: Option<Rc<RefCell<TreeNode>>>, b: Option<Rc<RefCell<TreeNode>>>) -> bool {
+    let temp = equal_structure(a.clone(), b.clone());
+    match a.clone() {
+        Some(mut node) => {
+            let left_tree = node.borrow_mut().left.take();
+            let right_tree = node.borrow_mut().right.take();
+            if temp || sub_structure(left_tree, b.clone()) || sub_structure(right_tree, b.clone()) {
+                return true;
+            } else {
                 return false;
             }
+        }
+        None => {
+            return false;
+        }
+    }
+}
+
+pub fn equal_structure(a: Option<Rc<RefCell<TreeNode>>>, b: Option<Rc<RefCell<TreeNode>>>) -> bool {
+    match (a, b) {
+        (Some(node1), Some(node2)) => {
+            let main_val = node1.borrow().val;
+            let branch_val = node2.borrow().val;
+            if main_val == branch_val
+                && equal_structure(node1.borrow().left.clone(), node2.borrow().left.clone())
+                && equal_structure(node1.borrow().right.clone(), node2.borrow().right.clone())
+            {
+                //println!("{}",main_val);
+                return true;
+            } else {
+                return false;
+            }
+        }
+        (Some(node1), None) => {
+            return true;
+        }
+        (None, Some(node2)) => {
+            return false;
+        }
+        (None, None) => {
+            return true;
         }
     }
 }

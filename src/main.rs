@@ -1,4 +1,4 @@
-pub mod of63;
+pub mod of59_2;
 fn main() {
     println!("Hello, world!");
 }
